@@ -18,28 +18,28 @@ const Timer = () => {
   let intervalRef = useRef(null);
 
   const startTimer = () => {
-    intervalRef.current = setInterval(() => {
-      setTime((prevTime) => {
-        let { hours, minutes, seconds } = prevTime;
-        seconds += 1;
-        if (seconds === 60) {
-          seconds = 0;
-          minutes += 1;
-        }
-        if (minutes === 60) {
-          minutes = 0;
-          hours += 1;
-        }
-        return { hours, minutes, seconds };
-      });
-    }, 1000);
+    setTime((prevTime) => {
+      let { hours, minutes, seconds } = prevTime;
+      seconds += 1;
+      if (seconds === 60) {
+        seconds = 0;
+        minutes += 1;
+      }
+      if (minutes === 60) {
+        minutes = 0;
+        hours += 1;
+      }
+      return { hours, minutes, seconds };
+    });
   };
 
   useEffect(() => {
     if (!isRunning) return;
-    startTimer();
+    intervalRef.current = setInterval(() => {
+      startTimer();
+    }, 1000);
     return () => clearInterval(intervalRef.current);
-  }, [isRunning]);
+  }, [isRunning, startTimer]);
 
   const handleStart = () => (!isRunning ? setRunning(true) : startTimer());
 
@@ -54,6 +54,7 @@ const Timer = () => {
   const handlePause = () => {
     clearInterval(intervalRef.current);
   };
+
   const handleReset = () => {
     setRunning(false);
     setTime({ hours: 0, minutes: 0, seconds: 0 });
