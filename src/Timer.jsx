@@ -12,11 +12,20 @@ const SettingTimer = ({ time }) => {
 };
 
 const Timer = () => {
+  //무엇이 시작되고 있는지 상태명 좀 더 상세하게 작성
   const [isRunning, setRunning] = useState(false);
+
   const [record, setRecord] = useState([]);
+
+  //const [timer, setTimer] = useState(0)
+  //120 -> 00:02:00 파싱해주는 함수를 만든다
+  //위처럼 하면 계산 없이 숫자 +1 추가만 해주면 됨
   const [time, setTime] = useState({ hours: 0, minutes: 0, seconds: 0 });
+
+  //timeout id를 담기 위한 ref
   let intervalRef = useRef(null);
 
+  //시간을 set하는 함수
   const startTimer = () => {
     setTime((prevTime) => {
       let { hours, minutes, seconds } = prevTime;
@@ -33,6 +42,8 @@ const Timer = () => {
     });
   };
 
+  //interver을 통해 timer함수를 1초마다 반복 실행
+  //isRunning true일 때
   useEffect(() => {
     if (!isRunning) return;
     intervalRef.current = setInterval(() => {
@@ -41,7 +52,12 @@ const Timer = () => {
     return () => clearInterval(intervalRef.current);
   }, [isRunning, startTimer]);
 
-  const handleStart = () => (!isRunning ? setRunning(true) : startTimer());
+  const handleStart = () => {
+    if (intervalRef.current && !isRunning) {
+      clearInterval(intervalRef.current); // 기존 interval 정리
+    }
+    setRunning(true);
+  };
 
   const handleRecord = () => {
     const { hours, minutes, seconds } = time;
@@ -53,6 +69,7 @@ const Timer = () => {
 
   const handlePause = () => {
     clearInterval(intervalRef.current);
+    setRunning(false);
   };
 
   const handleReset = () => {
@@ -61,10 +78,7 @@ const Timer = () => {
   };
   return (
     <>
-      <div>
-        {isRunning && <SettingTimer time={time} />}
-        {!isRunning && <span>00:00:00</span>}
-      </div>
+      <div>{<SettingTimer time={time} />}</div>
       <button onClick={handleStart}>start</button>
       <button onClick={handleRecord}>record</button>
       <button onClick={handleReset}>stop</button>
